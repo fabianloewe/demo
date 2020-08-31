@@ -1,0 +1,108 @@
+= Demo
+
+== Ziel
+
+In dieser Demo wurden die praktische Umsetzung der in der Bachelorarbeit beschriebenen Lösungsverfahren erarbeitet.
+Sie soll zum einen die Nutzbarkeit des Datenabfrageprotokolls beweisen.
+Zum anderen sollen die Visualisierungsmethoden zum Erproben bereitgestellt werden.
+
+== Stand
+
+Das Protokoll ist vollständig implementiert und wird zur Kommunikation genutzt.
+Alle grundsätzlichen Visualisierungsmethoden sind implementiert, es fehlen jedoch folgende:
+Auswahl mit Mausrad, ...
+
+== Umsetzung
+
+Die Demo besteht aus drei Komponenten:
+
+* der Datenbankapplikation
+* dem Webdienst
+* der Webapplikation für den Browser
+
+Die Datenbankapplikation hält einen Graphen bereit, welcher mittels eines Skriptes erstellt und
+über den Webdienst abgefragt werden kann.
+Der Webdienst kommuniziert über das Abfrageprotokoll mit der Datenbankapplikation und
+stellt die Webapplikation bereit.
+Die Webapplikation wird vom Browser geladen und übernimmt die Visualisierung.
+Sie kann Anfragen zunächst an den Webdienst versenden, der sie zur Datenbankapplikation weiterleitet.
+
+In den Quelltexten sind alle Variablen und Klassen sowie deren Dokumentationen und dazugehörige Kommentare
+in englischer Sprache verfasst, um den Code ohne starke Veränderung in ein größeres, quelloffenes Projekt übernehmen zu können.
+Ebenso ist die Weboberfläche englisch, da Teile dieser übernommen werden sollen.
+
+=== Struktur
+
+* `lib`: Enthält gemeinsame Quelldateien wie die Protocol Buffers Definitionen
+* `db-app`: Enthält die Datenbankapplikation
+** `src/main/kotlin/demo/config`: Konfigurationsklassen
+** `src/main/kotlin/demo/protocol`: Implementation des Abfrageprotokolls
+** `src/main/kotlin/demo/DatabaseService.kt`: Datenbankverwaltung
+** `src/main/kotlin/demo/PeerService.kt`: Netzwerkdienst
+** `src/main/kotlin/demo/Main.kt`: Kommandozeilenleser und Einstiegspunkt
+* `web-app`: Enthält den Webdienst und die -applikation
+** `src/server/index.js`: Enthält den Webdienst als angepasster Next.js Server
+** `src/*`: Hilfsfunktionen und Klassen für das Abfrageprotokoll und der Datenkonvertierung
+** `components`: Komponenten der Weboberfläche
+
+
+== Installation
+
+Es wird Java Version 11 sowie Node.js Version 11 benötigt.
+Aufgrund einer Service-Spezifikation des internen DBMS Neo4j kann keine "fat-jar" erstellt werden,
+sodass zum Ausführen auf Gradle zurückgegriffen werden muss.
+
+== Ausführung
+
+Zunächst muss die Datenbankapplikation gestartet werden und deren `PeerService` initialisiert sein.
+Dazu führt man in der Kommandozeile den folgenden Befehl aus, wobei `<db-init-script>` mit dem Namen
+eines Skripts im Ordner `scripts` ersetzt werden muss, um die Datenbank mit einem Graphen zu füllen.
+
+[bash]
+```
+./gradlew run --args="--init-db scripts/<db-init-script> <optional-weitere-args>"
+```
+
+Es werden weitere Kommandozeilenargumente unterstützt, die an Stelle von `<optional-weitere-args>` eingesetzt werden können.
+Sämtliche Argumente sind in der Datei `db-app/src/main/kotlin/demo/Main.kt` dokumentiert.
+
+Als Nächstes kann der Webdienst mit einem der folgenden Befehle gestartet werden.
+
+Den Entwicklungsserver starten:
+
+[bash]
+```
+npm run dev
+```
+
+Den Produktionsserver starten:
+
+[bash]
+```
+npm run build
+npm start
+```
+
+Die Webapplikation kann nun unter folgender Adresse erreicht werden:
+http://localhost:3000/
+
+== Benutzung
+
+In der Webapplikation muss zunächst eine Cypher-Abfrage ausgewählt oder formuliert werden.
+Durch den Knopf _Send_ wird diese an die Datenbankapplikation geleitet.
+
+Danach wird die Visualisierung konfiguriert. Das Drücken von _Save_ erstellt diese schließlich.
+Die Einstellungen können jederzeit angepasst werden.
+
+== Technologien und Hilfe
+
+* https://github.com/MindorksOpenSource/from-java-to-kotlin[Kotlin im Vergleich zu Java]
+* https://gradle.org/install/[Gradle Dokumentation]
+* https://docs.npmjs.com/cli-documentation/[Node.js Package Manager Dokumentation]
+* https://neo4j.com/docs/java-reference/current/java-embedded/[Neo4j Dokumentation]
+* https://docs.libp2p.io/concepts/[libp2p Dokumentation]
+* https://reactjs.org/docs/[React.js Dokumentation]
+* https://nextjs.org/docs/getting-started[Next.js Dokumentation]
+* https://material-ui.com/[Material-UI Dokumentation]
+* https://github.com/vasturiano/react-force-graph[React Force Graph]
+

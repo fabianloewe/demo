@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package demo.protocol;
+
+import "google/protobuf/any.proto";
+
+message Answer {
+  /**
+   * Defines the type of this answer message in a string.
+   */
+  string type = 1;
+
+  /**
+   * The data of the answer of any data type.
+   */
+  google.protobuf.Any data = 2;
+
+  /**
+   * Fields 3 to 10 are reserved for future use.
+   */
+  reserved 3 to 10;
+}

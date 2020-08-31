@@ -1,0 +1,12 @@
+Configuration:
+  status: info
+  Appenders:
+    Console:
+      name: STDOUT
+      PatternLayout:
+        Pattern: "[%d] %highlight{[%-5level]} %highlight{[%c{.1}]} - %style{%msg}{bright}%n%highlight{%throwable}"
+  Loggers:
+    Root:
+      level: debug
+      AppenderRef:
+        - ref: STDOUT

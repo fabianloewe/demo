@@ -1,0 +1,15 @@
+{
+  "name": "lib",
+  "version": "1.0.0",
+  "description": "Common library for demo apps",
+  "main": "src/main/js/index.js",
+  "scripts": {
+    "gen": "pbjs -t static-module -w commonjs -o src/main/js/index.js src/main/proto/*.proto"
+  },
+  "author": "Fabian Loewe",
+  "license": "MIT",
+  "dependencies": {
+    "google-protobuf": "^3.13.0",
+    "protobufjs": "^6.10.1"
+  }
+}

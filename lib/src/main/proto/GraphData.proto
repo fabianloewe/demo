@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package demo.protocol;
+
+message Vertex {
+  /*
+  Field 1: A unique identifier for this vertex
+   */
+  uint64 id = 1;
+
+  /*
+  Field 2: Properties of the vertex
+   */
+  map<string, string> properties = 2;
+
+  /*
+  Field 3: Labels for this vertex
+   */
+  repeated string labels = 3;
+}
+
+message Edge {
+  /*
+  Field 1: A unique identifier for this vertex
+   */
+  uint64 id = 1;
+
+  /*
+  Field 2: Properties of the vertex
+   */
+  map<string, string> properties = 2;
+
+  /*
+  Field 3: Labels for this vertex
+   */
+  repeated string labels = 3;
+
+  /*
+  Field 4: ID of the vertex this edge starts from.
+   */
+  uint64 fromVertex = 4;
+
+  /*
+  Field 5: ID of the vertex this edge ends in.
+   */
+  uint64 toVertex = 5;
+
+  /*
+  Field 6: IDs of the connected meta-edges.
+   */
+  repeated uint64 metaEdges = 6;
+}
+
+/*
+Represents vertices and edges with their connection.
+ */
+message GraphData {
+  repeated Vertex vertices = 1;
+  repeated Edge edges = 2;
+}
