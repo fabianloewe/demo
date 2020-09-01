@@ -2,6 +2,9 @@ syntax = "proto3";
 
 package demo.protocol;
 
+/*
+Defines an vertex in the graph answer in the Query protocol.
+ */
 message Vertex {
   /*
   Field 1: A unique identifier for this vertex
@@ -19,6 +22,9 @@ message Vertex {
   repeated string labels = 3;
 }
 
+/*
+Defines an vertex in the graph answer in the Query protocol.
+ */
 message Edge {
   /*
   Field 1: A unique identifier for this vertex
@@ -53,8 +59,17 @@ message Edge {
 
 /*
 Represents vertices and edges with their connection.
+
+This message is used in the data field of an Answer message.
  */
 message GraphData {
+  /*
+  Field 1: One or more Vertex messages.
+   */
   repeated Vertex vertices = 1;
+
+  /*
+  Field 2: One or more Edge message.
+   */
   repeated Edge edges = 2;
 }

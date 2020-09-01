@@ -2,27 +2,30 @@ syntax = "proto3";
 
 package demo.protocol;
 
+/*
+Defines a query message in the Query protocol.
+ */
 message Query {
-  /**
-   * The query to be executed.
+  /*
+  Field 1: The query to be executed.
    */
   string query = 1;
 
-  /**
-   * The query language used in field query.
+  /*
+  Field 2: The query language used in field query.
    */
   string language = 2;
 
-  /**
-   * A map of query arguments to be considered by the executing database.
+  /*
+  Field 3: A map of query arguments to be considered by the executing database.
    */
   map<string, string> args = 3;
 
-  /**
-   * One or more filters for the answers.
-   *
-   * If no filter is provided, all answers will be sent.
-   * Otherwise only answers matching at least one filter will be sent.
+  /*
+  Field 4: One or more filters for the answers.
+
+  If no filter is provided, all answers will be sent.
+  Otherwise only answers matching at least one filter will be sent.
    */
   repeated string filter = 4;
 }

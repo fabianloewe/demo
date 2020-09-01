@@ -46,25 +46,46 @@ Ebenso ist die Weboberfläche englisch, da Teile dieser übernommen werden solle
 ** `components`: Komponenten der Weboberfläche
 
 
-== Installation
+== Voraussetzungen
 
 Es wird Java Version 11 sowie Node.js Version 11 benötigt.
-Aufgrund einer Service-Spezifikation des internen DBMS Neo4j kann keine "fat-jar" erstellt werden,
-sodass zum Ausführen auf Gradle zurückgegriffen werden muss.
+
+== Installation
+
+Empfohlen ist das Herunterladen und Entpacken des aktuellen Release auf GitHub,
+um die Datenbankapplikation zu starten.
+
+Alternativ kann diese auch mit folgendem Befehl gebaut werden:
+
+[bash]
+```
+./gradlew build
+```
+
+Jedoch wird mindestens 2GB an Arbeitsspeicher benötigt.
 
 == Ausführung
 
 Zunächst muss die Datenbankapplikation gestartet werden und deren `PeerService` initialisiert sein.
-Dazu führt man in der Kommandozeile den folgenden Befehl aus, wobei `<db-init-script>` mit dem Namen
+Dazu führt man in der Kommandozeile die folgenden Befehle aus, wobei `<db-init-script>` mit dem Namen
 eines Skripts im Ordner `scripts` ersetzt werden muss, um die Datenbank mit einem Graphen zu füllen.
+
+
+[bash]
+```
+cd <pfad/zur/entpacketen/zip-datei>
+./bin/db-app --init-db scripts/<db-init-script> <optional-weitere-args>
+```
+
+Es werden weitere Kommandozeilenargumente unterstützt, die an Stelle von `<optional-weitere-args>` eingesetzt werden können.
+Sämtliche Argumente sind in der Datei `db-app/src/main/kotlin/demo/Main.kt` dokumentiert.
+
+Alternativ kann auch Gradle den Quellcode kompilieren und direkt ausführen:
 
 [bash]
 ```
 ./gradlew run --args="--init-db scripts/<db-init-script> <optional-weitere-args>"
 ```
-
-Es werden weitere Kommandozeilenargumente unterstützt, die an Stelle von `<optional-weitere-args>` eingesetzt werden können.
-Sämtliche Argumente sind in der Datei `db-app/src/main/kotlin/demo/Main.kt` dokumentiert.
 
 Als Nächstes kann der Webdienst mit einem der folgenden Befehle gestartet werden.
 

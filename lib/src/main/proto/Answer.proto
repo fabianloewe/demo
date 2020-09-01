@@ -2,21 +2,28 @@ syntax = "proto3";
 
 package demo.protocol;
 
+// Import the Any message type provided by Google
 import "google/protobuf/any.proto";
 
+/*
+Defines a answer or result message in the Query protocol.
+ */
 message Answer {
-  /**
-   * Defines the type of this answer message in a string.
+  /*
+  Field 1: Defines the type of this answer message in a string.
    */
   string type = 1;
 
-  /**
-   * The data of the answer of any data type.
+  /*
+  Field 2: The data of the answer of any data type.
+
+  It is recommend to use a Protocol Buffers message
+  because it can properly be deserialized.
    */
   google.protobuf.Any data = 2;
 
   /**
-   * Fields 3 to 10 are reserved for future use.
+  Fields 3 to 10 are reserved for future use.
    */
   reserved 3 to 10;
 }
