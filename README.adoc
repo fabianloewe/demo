@@ -48,7 +48,7 @@ Ebenso ist die Weboberfläche englisch, da Teile dieser übernommen werden solle
 
 == Voraussetzungen
 
-Es wird Java Version 11 sowie Node.js Version 11 benötigt.
+Es wird Java Version 11 sowie Node.js Version 14 benötigt.
 
 == Installation
 
@@ -64,18 +64,29 @@ Alternativ kann diese auch mit folgendem Befehl gebaut werden:
 
 Jedoch wird mindestens 2GB an Arbeitsspeicher benötigt.
 
+Im Ordner `web-app` müssen die Abhängigkeiten installiert werden:
+
+[bash]
+----
+npm install
+----
+
 == Ausführung
 
 Zunächst muss die Datenbankapplikation gestartet werden und deren `PeerService` initialisiert sein.
 Dazu führt man in der Kommandozeile die folgenden Befehle aus, wobei `<db-init-script>` mit dem Namen
 eines Skripts im Ordner `scripts` ersetzt werden muss, um die Datenbank mit einem Graphen zu füllen.
 
+Beim Ausführen wird die Datei `db-app-info.json` erstellt, welche die PeerID der Datenbankapplikation enthält.
+Diese Datei muss sich im Wurzelverzeichnis dieses Repos befinden.
+Daher sollte die Datenbankapplikation auch aus dem Wurzelverzeichnis gestartet werden.
+Alternativ kann die Datei nach dem Starten in das Verzeichnis kopiert werden.
 
 [bash]
-```
-cd <pfad/zur/entpacketen/zip-datei>
+----
+cd <pfad/zur/entpackten/zip-datei>
 ./bin/db-app --init-db scripts/<db-init-script> <optional-weitere-args>
-```
+----
 
 Es werden weitere Kommandozeilenargumente unterstützt, die an Stelle von `<optional-weitere-args>` eingesetzt werden können.
 Sämtliche Argumente sind in der Datei `db-app/src/main/kotlin/demo/Main.kt` dokumentiert.
@@ -83,26 +94,26 @@ Sämtliche Argumente sind in der Datei `db-app/src/main/kotlin/demo/Main.kt` dok
 Alternativ kann auch Gradle den Quellcode kompilieren und direkt ausführen:
 
 [bash]
-```
+----
 ./gradlew run --args="--init-db scripts/<db-init-script> <optional-weitere-args>"
-```
+----
 
 Als Nächstes kann der Webdienst mit einem der folgenden Befehle gestartet werden.
 
 Den Entwicklungsserver starten:
 
 [bash]
-```
+----
 npm run dev
-```
+----
 
 Den Produktionsserver starten:
 
 [bash]
-```
+----
 npm run build
 npm start
-```
+----
 
 Die Webapplikation kann nun unter folgender Adresse erreicht werden:
 http://localhost:3000/
