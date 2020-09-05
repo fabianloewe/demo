@@ -309,7 +309,7 @@ MATCH (actor:Vertex)
         -[:EdgeIn]->(:Vertex {Value: 'Rosamund Pike'}),
       (actor)-[:EdgeOut]->(hasRoleProp:Edge {Value: 'HAS_ROLE_IN'}),
       (role:Vertex)
-        -[:EdgeOut]->(:Edge {VALUE: 'IS_CALLED'})
+        -[:EdgeOut]->(:Edge {Value: 'IS_CALLED'})
         -[:EdgeIn]->(:Vertex {Value: 'Miranda Frost'})
 MERGE (hasRoleProp)-[:MetaEdge {Value: 'HAS_ROLE'}]->(role);
 
@@ -318,7 +318,7 @@ MATCH (actor:Vertex)
         -[:EdgeIn]->(:Vertex {Value: 'Halle Berry'}),
       (actor)-[:EdgeOut]->(hasRoleProp:Edge {Value: 'HAS_ROLE_IN'}),
       (role:Vertex)
-        -[:EdgeOut]->(:Edge {VALUE: 'IS_CALLED'})
+        -[:EdgeOut]->(:Edge {Value: 'IS_CALLED'})
         -[:EdgeIn]->(:Vertex {Value: 'Giacinta Jinx Johnson'})
 MERGE (hasRoleProp)-[:MetaEdge {Value: 'HAS_ROLE'}]->(role);
 
@@ -327,7 +327,7 @@ MATCH (actor:Vertex)
         -[:EdgeIn]->(:Vertex {Value: 'Pierce Brosnan'}),
       (actor)-[:EdgeOut]->(hasRoleProp:Edge {Value: 'HAS_ROLE_IN'}),
       (role:Vertex)
-        -[:EdgeOut]->(:Edge {VALUE: 'IS_CALLED'})
+        -[:EdgeOut]->(:Edge {Value: 'IS_CALLED'})
         -[:EdgeIn]->(:Vertex {Value: 'James Bond'})
 MERGE (hasRoleProp)-[:MetaEdge {Value: 'HAS_ROLE'}]->(role);
 
