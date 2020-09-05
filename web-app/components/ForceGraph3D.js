@@ -166,6 +166,8 @@ function ForceGraph3D({data, forceGraphProps, settings}) {
 	const [selectedNodes, setSelectedNodes] = useState([]);
 	const [centerPropView, setCenterPropView] = useState(null);
 
+	const controlType = settings.controlType;
+
 	const colorNode = node => {
 		if (highlight.nodes.includes(node) || selectedNodes.includes(node)) {
 			return theme.palette.secondary.main;
@@ -314,6 +316,7 @@ function ForceGraph3D({data, forceGraphProps, settings}) {
 				graphData={data}
 				enableNodeDrag={false}
 				enableNavigationControls={enableControls}
+				controlType={controlType}
 				showNavInfo={true}
 				backgroundColor={theme.palette.type === "light" ? "white" : "black"}
 				linkWidth={link => link === highlight.link ? 4 : 1}

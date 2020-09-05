@@ -7,3 +7,6 @@ yarn.lock
 build
 .idea
 .gradle
+data/
+logs/
+db-app-info.json

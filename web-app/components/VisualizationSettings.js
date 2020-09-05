@@ -97,6 +97,7 @@ export default function VisualizationSettings({onSave, onClear}) {
 	const [edgeStyle, setEdgeStyle] = React.useState("nothing");
 	const [edgeStyleProp, setEdgeStyleProp] = React.useState("");
 	const [enableZoom, setEnableZoom] = React.useState(false);
+	const [controlType, setControlType] = React.useState("trackball");
 
 	const handleTabValueChange = (e, v) => setTabValue(v);
 	const handleDimensionChange = e => setDimension(e.target.value);
@@ -112,6 +113,7 @@ export default function VisualizationSettings({onSave, onClear}) {
 	const handleEdgeStyleChange = e => setEdgeStyle(e.target.value);
 	const handleEdgeStylePropChange = e => setEdgeStyleProp(e.target.value);
 	const handleEnableZoomChange = e => setEnableZoom(e.target.checked);
+	const handleControlType = (e, v) => setControlType(v);
 
 	const handleSave = () => {
 		onSave({
@@ -125,6 +127,7 @@ export default function VisualizationSettings({onSave, onClear}) {
 			edgeStyle,
 			edgeStyleProp: edgeStyleProp !== "" ? edgeStyleProp : undefined,
 			enableZoom,
+			controlType
 		})
 	};
 	const handleClear = () => {
@@ -226,7 +229,7 @@ export default function VisualizationSettings({onSave, onClear}) {
 												onChange={handleEnableScrollSelectChange}
 												name="multi-select-scroll"
 												color="primary"
-												disabled={true}
+												disabled={dimension === "3D"}
 											/>
 										}
 										label="Enable Multi-Select with Scrolling"
@@ -281,19 +284,35 @@ export default function VisualizationSettings({onSave, onClear}) {
 						</RadioGroup>
 					</TabPanel>
 					<TabPanel value={tabValue} index={3}>
-						<FormGroup>
-							<FormControlLabel
-								control={
-									<Checkbox
-										checked={enableZoom}
-										onChange={handleEnableZoomChange}
-										name="multi-select-shift"
-										color="primary"
+						<Grid container>
+							<Grid item>
+								<FormGroup>
+									<FormControlLabel
+										control={
+											<Checkbox
+												checked={enableZoom}
+												onChange={handleEnableZoomChange}
+												name="multi-select-shift"
+												color="primary"
+											/>
+										}
+										label="Enable Zoom to Node"
 									/>
-								}
-								label="Enable Zoom to Node"
-							/>
-						</FormGroup>
+								</FormGroup>
+							</Grid>
+							<Grid item>
+								<RadioGroup
+									aria-label="control-type"
+									name="control-type"
+									value={controlType}
+									onChange={handleControlType}
+								>
+									<FormControlLabel value="trackball" control={<Radio/>} label="Enable trackball control"/>
+									<FormControlLabel value="fly" control={<Radio/>} label="Enable fly control"/>
+									<FormControlLabel value="orbit" control={<Radio/>} label="Enable orbit control"/>
+								</RadioGroup>
+							</Grid>
+						</Grid>
 					</TabPanel>
 				</div>
 				<Grid container justify="space-between" className={classes.buttons}>

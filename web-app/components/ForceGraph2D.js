@@ -226,9 +226,25 @@ function InfoCard({element}) {
 }
 
 /**
+ * @typedef Node
+ * @property {string} id
+ * @property {string} label
+ * @property {{[string]: string}|undefined} properties
+ */
+
+/**
+ * @typedef Link
+ * @property {string} id
+ * @property {string} label
+ * @property {{[string]: string}|undefined} properties
+ * @property {string|number|Node} source
+ * @property {string|number|Node} target
+ */
+
+/**
  * The 3D force graph.
  *
- * @param data
+ * @param {{nodes: [Node], links: [Link]}} data
  * @param forceGraphProps
  * @param settings
  * @returns {JSX.Element}
@@ -244,6 +260,7 @@ function ForceGraph2D({data, forceGraphProps, settings}) {
 	});
 	const [selectedNodes, setSelectedNodes] = useState([]);
 	const [centerPropView, setCenterPropView] = useState(null);
+	const [prevZoomValue, setPrevZoomValue] = useState(1);
 
 	const colorNode = node => {
 		if (highlight.nodes.includes(node) || selectedNodes.includes(node)) {
@@ -274,7 +291,7 @@ function ForceGraph2D({data, forceGraphProps, settings}) {
 	const drawSpecialNode = (node, ctx) => {
 		switch (node.label) {
 			case "Edge":
-				ctx.fillStyle = theme.palette.secondary.main;
+				ctx.fillStyle = colorNode(node);
 				ctx.fillRect(
 					node.x - 3,
 					node.y - 3,
@@ -284,7 +301,7 @@ function ForceGraph2D({data, forceGraphProps, settings}) {
 				break;
 			case "Vertex":
 			default:
-				ctx.fillStyle = node.color || theme.palette.primary.main;
+				ctx.fillStyle = colorNode(node);
 				ctx.beginPath();
 				ctx.arc(node.x, node.y, 3, 0, Math.PI * 2);
 				ctx.fill();
@@ -339,11 +356,30 @@ function ForceGraph2D({data, forceGraphProps, settings}) {
 		drawLinkLabel = "";
 	}
 
+	let handleZoom = undefined;
+	if (settings.enableScrollSelect) {
+		handleZoom = ({k: zoomValue}) => {
+			const zoomDiff = zoomValue - prevZoomValue;
+			const zoomThreshold = 0.01;
+			setPrevZoomValue(zoomValue);
+			if (zoomDiff > zoomThreshold) {
+				// When zooming in,
+				// select nodes connected to the already selected ones.
+				const nodes = data.links
+					.filter(link => selectedNodes.includes(link.source))
+					.flatMap(link => link.target);
+				setSelectedNodes([...selectedNodes, ...nodes]);
+			}
+		}
+	}
+
 	const handleClick = (node, event) => {
 		if (settings.enableShiftSelect && event.shiftKey) {
 			selectedNodes.includes(node)
 				? setSelectedNodes(selectedNodes.filter(n => n !== node))
 				: setSelectedNodes([...selectedNodes, node]);
+		} else if (selectedNodes.includes(node)) {
+			setSelectedNodes(selectedNodes.filter(selectedNode => selectedNode !== node));
 		} else {
 			setSelectedNodes([node]);
 		}
@@ -378,7 +414,7 @@ function ForceGraph2D({data, forceGraphProps, settings}) {
 			<ForceGraph2DEngine
 				ref={fgRef}
 				graphData={data}
-				enableNodeDrag={true}
+				enableNodeDrag={false}
 				showNavInfo={true}
 				backgroundColor={theme.palette.type === "light" ? "white" : "black"}
 				linkWidth={link => link === highlight.link ? 4 : 1}
@@ -388,12 +424,12 @@ function ForceGraph2D({data, forceGraphProps, settings}) {
 				linkLabel={drawLinkLabel}
 				linkCanvasObject={drawLink}
 			  linkCanvasObjectMode={() => 'after'}
-				nodeColor={colorNode}
 				nodeLabel={drawNodeLabel}
 				onNodeHover={handleNodeHover}
 				onLinkHover={handleLinkHover}
 				onNodeClick={handleClick}
 				nodeCanvasObject={drawNode}
+				onZoom={handleZoom}
 				{...forceGraphProps}
 			/>
 			{centerPropView && <InfoCard element={centerPropView}/>}
