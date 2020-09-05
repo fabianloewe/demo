@@ -77,7 +77,7 @@ Zunächst muss die Datenbankapplikation gestartet werden und deren `PeerService`
 Dazu führt man in der Kommandozeile die folgenden Befehle aus, wobei `<db-init-script>` mit dem Namen
 eines Skripts im Ordner `scripts` ersetzt werden muss, um die Datenbank mit einem Graphen zu füllen.
 
-Beim Ausführen wird die Datei `db-app-info.json` erstellt, welche die PeerID der Datenbankapplikation enthält.
+Beim Ausführen wird die Datei `db-app-info.json` erstellt, welche die Adresse der Datenbankapplikation enthält.
 Diese Datei muss sich im Wurzelverzeichnis dieses Repos befinden.
 Daher sollte die Datenbankapplikation auch aus dem Wurzelverzeichnis gestartet werden.
 Alternativ kann die Datei nach dem Starten in das Verzeichnis kopiert werden.
