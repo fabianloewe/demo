@@ -62,12 +62,8 @@ class DatabaseService(
                 it.trim()
             }
 
-        db.beginTx().use { tx ->
-            for (stmt in statements) {
-                //logger.debug("Executing statement: $stmt")
-                tx.execute(stmt)
-            }
-            tx.commit()
+        for (stmt in statements) {
+            db.executeTransactionally(stmt)
         }
     }
 

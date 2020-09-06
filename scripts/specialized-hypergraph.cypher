@@ -7,14 +7,7 @@ MATCH (n)
 DETACH DELETE n;
 
 //
-// Create some primitive types
-//
-CREATE (:Vertex {Value: 'StringType'});
-
-CREATE (:Vertex {Value: 'IntegerType'});
-
-//
-// Create specific types
+// Create types
 //
 
 CREATE (:Vertex {Value: 'People'});
@@ -69,8 +62,7 @@ MERGE (role)
 // Add actors
 //
 
-MATCH (people:Vertex {Value: 'People'}),
-      (string:Vertex {Value: 'StringType'})
+MATCH (people:Vertex {Value: 'People'})
 CREATE (v:Vertex)
 CREATE (name:Vertex {Value: 'Lee Tamahori'})
 MERGE (v)
@@ -78,13 +70,9 @@ MERGE (v)
   -[:EdgeIn]->(name)
 MERGE (v)
   -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(people)
-MERGE (name)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string);
+  -[:EdgeIn]->(people);
 
-MATCH (people:Vertex {Value: 'People'}),
-      (string:Vertex {Value: 'StringType'})
+MATCH (people:Vertex {Value: 'People'})
 CREATE (v:Vertex)
 CREATE (name:Vertex {Value: 'Rosamund Pike'})
 MERGE (v)
@@ -92,13 +80,9 @@ MERGE (v)
   -[:EdgeIn]->(name)
 MERGE (v)
   -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(people)
-MERGE (name)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string);
+  -[:EdgeIn]->(people);
 
-MATCH (people:Vertex {Value: 'People'}),
-      (string:Vertex {Value: 'StringType'})
+MATCH (people:Vertex {Value: 'People'})
 CREATE (v:Vertex)
 CREATE (name:Vertex {Value: 'Halle Berry'})
 MERGE (v)
@@ -106,13 +90,9 @@ MERGE (v)
   -[:EdgeIn]->(name)
 MERGE (v)
   -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(people)
-MERGE (name)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string);
+  -[:EdgeIn]->(people);
 
-MATCH (people:Vertex {Value: 'People'}),
-      (string:Vertex {Value: 'StringType'})
+MATCH (people:Vertex {Value: 'People'})
 CREATE (v:Vertex)
 CREATE (name:Vertex {Value: 'Pierce Brosnan'})
 MERGE (v)
@@ -120,17 +100,13 @@ MERGE (v)
   -[:EdgeIn]->(name)
 MERGE (v)
   -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(people)
-MERGE (name)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string);
+  -[:EdgeIn]->(people);
 
 //
 // Add vehicles
 //
 
-MATCH (vehicle:Vertex {Value: 'Vehicle'}),
-      (string:Vertex {Value: 'StringType'})
+MATCH (vehicle:Vertex {Value: 'Vehicle'})
 CREATE (v:Vertex)
 CREATE (brand:Vertex {Value: 'Jaguar'})
 CREATE (model:Vertex {Value: 'XKR'})
@@ -142,16 +118,9 @@ MERGE (v)
   -[:EdgeIn]->(model)
 MERGE (v)
   -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(vehicle)
-MERGE (brand)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string)
-MERGE (model)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string);
+  -[:EdgeIn]->(vehicle);
 
-MATCH (vehicle:Vertex {Value: 'Vehicle'}),
-      (string:Vertex {Value: 'StringType'})
+MATCH (vehicle:Vertex {Value: 'Vehicle'})
 CREATE (v:Vertex)
 CREATE (brand:Vertex {Value: 'Aston Martin'})
 CREATE (model:Vertex {Value: 'V12 Vanquish'})
@@ -163,16 +132,9 @@ MERGE (v)
   -[:EdgeIn]->(model)
 MERGE (v)
   -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(vehicle)
-MERGE (brand)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string)
-MERGE (model)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string);
+  -[:EdgeIn]->(vehicle);
 
 MATCH (vehicle:Vertex {Value: 'Vehicle'}),
-      (string:Vertex {Value: 'StringType'}),
       (brand:Vertex {Value: 'Aston Martin'})
 CREATE (v:Vertex)
 CREATE (model:Vertex {Value: 'DBS V12'})
@@ -184,13 +146,9 @@ MERGE (v)
   -[:EdgeIn]->(model)
 MERGE (v)
   -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(vehicle)
-MERGE (model)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string);
+  -[:EdgeIn]->(vehicle);
 
 MATCH (vehicle:Vertex {Value: 'Vehicle'}),
-      (string:Vertex {Value: 'StringType'}),
       (brand:Vertex {Value: 'Aston Martin'})
 CREATE (v:Vertex)
 CREATE (model:Vertex {Value: 'DB10'})
@@ -202,18 +160,13 @@ MERGE (v)
   -[:EdgeIn]->(model)
 MERGE (v)
   -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(vehicle)
-MERGE (model)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string);
+  -[:EdgeIn]->(vehicle);
 
 //
 // Add film
 //
 
-MATCH (film:Vertex {Value: 'Film'}),
-      (string:Vertex {Value: 'StringType'}),
-      (integer:Vertex {Value: 'IntegerType'})
+MATCH (film:Vertex {Value: 'Film'})
 CREATE (v:Vertex)
 CREATE (name:Vertex {Value: 'Die Another Day'})
 CREATE (year:Vertex {Value: 2002})
@@ -229,23 +182,13 @@ MERGE (v)
   -[:EdgeIn]->(box)
 MERGE (v)
   -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(film)
-MERGE (name)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string)
-MERGE (year)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(integer)
-MERGE (box)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(integer);
+  -[:EdgeIn]->(film);
 
 //
 // Add roles
 //
 
-MATCH (role:Vertex {Value: 'Role'}),
-      (string:Vertex {Value: 'StringType'})
+MATCH (role:Vertex {Value: 'Role'})
 CREATE (v:Vertex)
 CREATE (name:Vertex {Value: 'Miranda Frost'})
 MERGE (v)
@@ -253,13 +196,9 @@ MERGE (v)
   -[:EdgeIn]->(name)
 MERGE (v)
   -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(role)
-MERGE (name)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string);
+  -[:EdgeIn]->(role);
 
-MATCH (role:Vertex {Value: 'Role'}),
-      (string:Vertex {Value: 'StringType'})
+MATCH (role:Vertex {Value: 'Role'})
 CREATE (v:Vertex)
 CREATE (name:Vertex {Value: 'Giacinta Jinx Johnson'})
 MERGE (v)
@@ -267,13 +206,9 @@ MERGE (v)
   -[:EdgeIn]->(name)
 MERGE (v)
   -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(role)
-MERGE (name)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string);
+  -[:EdgeIn]->(role);
 
-MATCH (role:Vertex {Value: 'Role'}),
-      (string:Vertex {Value: 'StringType'})
+MATCH (role:Vertex {Value: 'Role'})
 CREATE (v:Vertex)
 CREATE (name:Vertex {Value: 'James Bond'})
 MERGE (v)
@@ -281,10 +216,7 @@ MERGE (v)
   -[:EdgeIn]->(name)
 MERGE (v)
   -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(role)
-MERGE (name)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(string);
+  -[:EdgeIn]->(role);
 
 //
 // Assign actors to film
