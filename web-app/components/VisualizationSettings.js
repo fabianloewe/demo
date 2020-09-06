@@ -15,6 +15,7 @@ import {
 	AppBar,
 	Tab,
 	Tabs,
+	Tooltip,
 	TextField,
 	Checkbox
 } from "@material-ui/core";
@@ -92,12 +93,15 @@ export default function VisualizationSettings({onSave, onClear}) {
 	const [centerPropertiesView, setCenterPropertiesView] = React.useState(false);
 	const [enableShiftSelect, setEnableShiftSelect] = React.useState(true);
 	const [enableScrollSelect, setEnableScrollSelect] = React.useState(false);
+	const [enableCut, setEnableCut] = React.useState(true);
 	const [vertexStyle, setVertexStyle] = React.useState("round");
 	const [vertexStyleProp, setVertexStyleProp] = React.useState("");
 	const [edgeStyle, setEdgeStyle] = React.useState("nothing");
 	const [edgeStyleProp, setEdgeStyleProp] = React.useState("");
 	const [enableZoom, setEnableZoom] = React.useState(false);
 	const [controlType, setControlType] = React.useState("trackball");
+
+	const is3D = dimension === "3D";
 
 	const handleTabValueChange = (e, v) => setTabValue(v);
 	const handleDimensionChange = e => setDimension(e.target.value);
@@ -108,6 +112,7 @@ export default function VisualizationSettings({onSave, onClear}) {
 	const handleCenterPropertiesViewChange = e => setCenterPropertiesView(e.target.checked);
 	const handleEnableShiftSelectChange = e => setEnableShiftSelect(e.target.checked);
 	const handleEnableScrollSelectChange = e => setEnableScrollSelect(e.target.checked);
+	const handleEnableCutChange = e => setEnableCut(e.target.checked);
 	const handleVertexStyleChange = e => setVertexStyle(e.target.value);
 	const handleVertexStylePropChange = e => setVertexStyleProp(e.target.value);
 	const handleEdgeStyleChange = e => setEdgeStyle(e.target.value);
@@ -127,7 +132,8 @@ export default function VisualizationSettings({onSave, onClear}) {
 			edgeStyle,
 			edgeStyleProp: edgeStyleProp !== "" ? edgeStyleProp : undefined,
 			enableZoom,
-			controlType
+			controlType,
+			enableCut
 		})
 	};
 	const handleClear = () => {
@@ -166,7 +172,8 @@ export default function VisualizationSettings({onSave, onClear}) {
 							<Tab label="Basic Settings" {...a11yProps(0)} />
 							<Tab label="Vertex Style" {...a11yProps(1)} />
 							<Tab label="Edge Style" {...a11yProps(2)} />
-							<Tab label="3D Settings" {...a11yProps(3)} />
+							<Tab label="2D Settings" {...a11yProps(3)} />
+							<Tab label="3D Settings" {...a11yProps(4)} />
 						</Tabs>
 					</AppBar>
 					<TabPanel value={tabValue} index={0}>
@@ -193,7 +200,7 @@ export default function VisualizationSettings({onSave, onClear}) {
 												color="primary"
 											/>
 										}
-										label="Show Properties"
+										label="Show properties"
 									/>
 									<FormControlLabel
 										control={
@@ -205,7 +212,7 @@ export default function VisualizationSettings({onSave, onClear}) {
 												disabled={!showProperties}
 											/>
 										}
-										label="Center Properties View"
+										label="Center properties view"
 									/>
 								</FormGroup>
 							</Grid>
@@ -220,20 +227,21 @@ export default function VisualizationSettings({onSave, onClear}) {
 												color="primary"
 											/>
 										}
-										label="Enable Multi-Select with Shift-Key"
+										label="Enable multi-select with Shift-key"
 									/>
-									<FormControlLabel
-										control={
-											<Checkbox
-												checked={enableScrollSelect}
-												onChange={handleEnableScrollSelectChange}
-												name="multi-select-scroll"
-												color="primary"
-												disabled={dimension === "3D"}
-											/>
-										}
-										label="Enable Multi-Select with Scrolling"
-									/>
+									<Tooltip title="Enables cutting after selection when right-clicking in the background">
+										<FormControlLabel
+											control={
+												<Checkbox
+													checked={enableCut}
+													onChange={handleEnableCutChange}
+													name="cut"
+													color="primary"
+												/>
+											}
+											label="Enable cut"
+										/>
+									</Tooltip>
 								</FormGroup>
 							</Grid>
 						</Grid>
@@ -245,11 +253,11 @@ export default function VisualizationSettings({onSave, onClear}) {
 							value={vertexStyle}
 							onChange={handleVertexStyleChange}
 						>
-							<FormControlLabel value="round" control={<Radio/>} label="Show Globe"/>
-							<FormControlLabel value="label" control={<Radio/>} label="Show Label"/>
+							<FormControlLabel value="round" control={<Radio/>} label="Show sphere"/>
+							<FormControlLabel value="label" control={<Radio/>} label="Show label"/>
 							<FormControlLabel value="property" control={<Radio/>} label={
 								<Box className={classes.propertyStyle}>
-									<p className={classes.rightSpace}>Show Property: </p>
+									<p className={classes.rightSpace}>Show property: </p>
 									<TextField
 										placeholder="Property Name"
 										disabled={vertexStyle !== "property"}
@@ -267,12 +275,12 @@ export default function VisualizationSettings({onSave, onClear}) {
 							value={edgeStyle}
 							onChange={handleEdgeStyleChange}
 						>
-							<FormControlLabel value="nothing" control={<Radio/>} label="Show Nothing"/>
-							<FormControlLabel value="direction" control={<Radio/>} label="Show Direction"/>
-							<FormControlLabel value="label" control={<Radio/>} label="Show Label"/>
+							<FormControlLabel value="nothing" control={<Radio/>} label="Show circle"/>
+							<FormControlLabel value="direction" control={<Radio/>} label="Show direction"/>
+							<FormControlLabel value="label" control={<Radio/>} label="Show label"/>
 							<FormControlLabel value="property" control={<Radio/>} label={
 								<Box className={classes.propertyStyle}>
-									<p className={classes.rightSpace}>Show Property: </p>
+									<p className={classes.rightSpace}>Show property: </p>
 									<TextField
 										placeholder="Property Name"
 										disabled={edgeStyle !== "property"}
@@ -284,6 +292,22 @@ export default function VisualizationSettings({onSave, onClear}) {
 						</RadioGroup>
 					</TabPanel>
 					<TabPanel value={tabValue} index={3}>
+						<FormGroup>
+							<FormControlLabel
+								control={
+									<Checkbox
+										checked={enableScrollSelect}
+										onChange={handleEnableScrollSelectChange}
+										name="multi-select-scroll"
+										color="primary"
+										disabled={is3D}
+									/>
+								}
+								label="Enable multi-select with scrolling"
+							/>
+						</FormGroup>
+					</TabPanel>
+					<TabPanel value={tabValue} index={4}>
 						<Grid container>
 							<Grid item>
 								<FormGroup>
@@ -294,9 +318,10 @@ export default function VisualizationSettings({onSave, onClear}) {
 												onChange={handleEnableZoomChange}
 												name="multi-select-shift"
 												color="primary"
+												disabled={is3D}
 											/>
 										}
-										label="Enable Zoom to Node"
+										label="Enable zoom to node"
 									/>
 								</FormGroup>
 							</Grid>
@@ -307,9 +332,24 @@ export default function VisualizationSettings({onSave, onClear}) {
 									value={controlType}
 									onChange={handleControlType}
 								>
-									<FormControlLabel value="trackball" control={<Radio/>} label="Enable trackball control"/>
-									<FormControlLabel value="fly" control={<Radio/>} label="Enable fly control"/>
-									<FormControlLabel value="orbit" control={<Radio/>} label="Enable orbit control"/>
+									<FormControlLabel
+										value="trackball"
+										control={<Radio/>}
+										label="Enable trackball control"
+										disabled={!is3D}
+									/>
+									<FormControlLabel
+										value="fly"
+										control={<Radio/>}
+										label="Enable fly control"
+										disabled={!is3D}
+									/>
+									<FormControlLabel
+										value="orbit"
+										control={<Radio/>}
+										label="Enable orbit control"
+										disabled={!is3D}
+									/>
 								</RadioGroup>
 							</Grid>
 						</Grid>

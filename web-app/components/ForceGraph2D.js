@@ -258,6 +258,7 @@ function ForceGraph2D({data, forceGraphProps, settings}) {
 		nodes: [],
 		link: null
 	});
+	const [graph, setGraph] = useState(data);
 	const [selectedNodes, setSelectedNodes] = useState([]);
 	const [centerPropView, setCenterPropView] = useState(null);
 	const [prevZoomValue, setPrevZoomValue] = useState(1);
@@ -373,6 +374,22 @@ function ForceGraph2D({data, forceGraphProps, settings}) {
 		}
 	}
 
+	let handleBackgroundRightClick = undefined;
+	if (settings.enableCut) {
+		handleBackgroundRightClick = () => {
+			if (selectedNodes.length > 0) {
+				const links = graph.links.filter(link =>
+					selectedNodes.includes(link.source) && selectedNodes.includes(link.target)
+				);
+				const selectedGraph = {
+					nodes: selectedNodes,
+					links
+				};
+				setGraph(selectedGraph);
+			}
+		};
+	}
+
 	const handleClick = (node, event) => {
 		if (settings.enableShiftSelect && event.shiftKey) {
 			selectedNodes.includes(node)
@@ -413,7 +430,7 @@ function ForceGraph2D({data, forceGraphProps, settings}) {
 		<div className={classes.container}>
 			<ForceGraph2DEngine
 				ref={fgRef}
-				graphData={data}
+				graphData={graph}
 				enableNodeDrag={false}
 				showNavInfo={true}
 				backgroundColor={theme.palette.type === "light" ? "white" : "black"}
@@ -430,6 +447,7 @@ function ForceGraph2D({data, forceGraphProps, settings}) {
 				onNodeClick={handleClick}
 				nodeCanvasObject={drawNode}
 				onZoom={handleZoom}
+				onBackgroundRightClick={handleBackgroundRightClick}
 				{...forceGraphProps}
 			/>
 			{centerPropView && <InfoCard element={centerPropView}/>}

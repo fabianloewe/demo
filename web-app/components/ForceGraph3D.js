@@ -163,6 +163,7 @@ function ForceGraph3D({data, forceGraphProps, settings}) {
 		nodes: [],
 		link: null
 	});
+	const [graph, setGraph] = useState(data);
 	const [selectedNodes, setSelectedNodes] = useState([]);
 	const [centerPropView, setCenterPropView] = useState(null);
 
@@ -263,6 +264,22 @@ function ForceGraph3D({data, forceGraphProps, settings}) {
 		drawLinkLabel = "";
 	}
 
+	let handleBackgroundRightClick = undefined;
+	if (settings.enableCut) {
+		handleBackgroundRightClick = () => {
+			if (selectedNodes.length > 0) {
+				const links = graph.links.filter(link =>
+					selectedNodes.includes(link.source) && selectedNodes.includes(link.target)
+				);
+				const selectedGraph = {
+					nodes: selectedNodes,
+					links
+				};
+				setGraph(selectedGraph);
+			}
+		};
+	}
+
 	const handleClick = (node, event) => {
 		if (settings.enableShiftSelect && event.shiftKey) {
 			selectedNodes.includes(node)
@@ -313,7 +330,7 @@ function ForceGraph3D({data, forceGraphProps, settings}) {
 		<div className={classes.container}>
 			<ForceGraph3DEngine
 				ref={fgRef}
-				graphData={data}
+				graphData={graph}
 				enableNodeDrag={false}
 				enableNavigationControls={enableControls}
 				controlType={controlType}
@@ -335,6 +352,7 @@ function ForceGraph3D({data, forceGraphProps, settings}) {
 				onLinkHover={handleLinkHover}
 				onNodeClick={handleClick}
 				nodeThreeObject={drawNode}
+				onBackgroundRightClick={handleBackgroundRightClick}
 				{...forceGraphProps}
 			/>
 			{centerPropView && <InfoCard element={centerPropView}/>}
