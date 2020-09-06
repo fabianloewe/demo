@@ -318,7 +318,7 @@ export default function VisualizationSettings({onSave, onClear}) {
 												onChange={handleEnableZoomChange}
 												name="multi-select-shift"
 												color="primary"
-												disabled={is3D}
+												disabled={!is3D}
 											/>
 										}
 										label="Enable zoom to node"

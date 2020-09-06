@@ -366,10 +366,12 @@ function ForceGraph2D({data, forceGraphProps, settings}) {
 			if (zoomDiff > zoomThreshold) {
 				// When zooming in,
 				// select nodes connected to the already selected ones.
-				const nodes = data.links
+				const nodes = graph.links
 					.filter(link => selectedNodes.includes(link.source))
 					.flatMap(link => link.target);
-				setSelectedNodes([...selectedNodes, ...nodes]);
+				// Distinct nodes only
+				const newSelectedNodes = [...new Set([...selectedNodes, ...nodes])];
+				setSelectedNodes(newSelectedNodes);
 			}
 		}
 	}
