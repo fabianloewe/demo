@@ -379,7 +379,7 @@ function ForceGraph2D({data, forceGraphProps, settings}) {
 	let handleBackgroundRightClick = undefined;
 	if (settings.enableCut) {
 		handleBackgroundRightClick = () => {
-			if (selectedNodes.length > 0) {
+			if (selectedNodes.length > 1) {
 				const links = graph.links.filter(link =>
 					selectedNodes.includes(link.source) && selectedNodes.includes(link.target)
 				);

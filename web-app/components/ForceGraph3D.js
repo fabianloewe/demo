@@ -246,7 +246,8 @@ function ForceGraph3D({data, forceGraphProps, settings}) {
 		default:
 			// Draw default nodes
 			drawLink = () => null;
-			updateLinkPosition = () => {};
+			updateLinkPosition = () => {
+			};
 			break;
 	}
 
@@ -264,10 +265,10 @@ function ForceGraph3D({data, forceGraphProps, settings}) {
 		drawLinkLabel = "";
 	}
 
-	let handleBackgroundRightClick = undefined;
+	let handleBackgroundRightClick;
 	if (settings.enableCut) {
 		handleBackgroundRightClick = () => {
-			if (selectedNodes.length > 0) {
+			if (selectedNodes.length > 1) {
 				const links = graph.links.filter(link =>
 					selectedNodes.includes(link.source) && selectedNodes.includes(link.target)
 				);
