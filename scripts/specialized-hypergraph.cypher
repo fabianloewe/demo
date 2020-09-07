@@ -62,45 +62,26 @@ MERGE (role)
 // Add actors
 //
 
-MATCH (people:Vertex {Value: 'People'})
-CREATE (v:Vertex)
-CREATE (name:Vertex {Value: 'Lee Tamahori'})
-MERGE (v)
-  -[:EdgeOut]->(hasName:Edge {Value: 'HAS_NAME'})
-  -[:EdgeIn]->(name)
-MERGE (v)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(people);
+CREATE (:Vertex)
+         -[:EdgeOut]->(:Edge {Value: 'HAS_NAME'})
+         -[:EdgeIn]->(:Vertex {Value: 'Lee Tamahori'});
 
-MATCH (people:Vertex {Value: 'People'})
-CREATE (v:Vertex)
-CREATE (name:Vertex {Value: 'Rosamund Pike'})
-MERGE (v)
-  -[:EdgeOut]->(:Edge {Value: 'HAS_NAME'})
-  -[:EdgeIn]->(name)
-MERGE (v)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(people);
+CREATE (:Vertex)
+         -[:EdgeOut]->(:Edge {Value: 'HAS_NAME'})
+         -[:EdgeIn]->(:Vertex {Value: 'Rosamund Pike'});
 
-MATCH (people:Vertex {Value: 'People'})
-CREATE (v:Vertex)
-CREATE (name:Vertex {Value: 'Halle Berry'})
-MERGE (v)
-  -[:EdgeOut]->(:Edge {Value: 'HAS_NAME'})
-  -[:EdgeIn]->(name)
-MERGE (v)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(people);
+CREATE (:Vertex)
+         -[:EdgeOut]->(:Edge {Value: 'HAS_NAME'})
+         -[:EdgeIn]->(:Vertex {Value: 'Halle Berry'});
 
-MATCH (people:Vertex {Value: 'People'})
-CREATE (v:Vertex)
-CREATE (name:Vertex {Value: 'Pierce Brosnan'})
-MERGE (v)
-  -[:EdgeOut]->(:Edge {Value: 'HAS_NAME'})
-  -[:EdgeIn]->(name)
-MERGE (v)
-  -[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})
-  -[:EdgeIn]->(people);
+CREATE (:Vertex)
+         -[:EdgeOut]->(:Edge {Value: 'HAS_NAME'})
+         -[:EdgeIn]->(:Vertex {Value: 'Pierce Brosnan'});
+
+// Make actors instance of People
+MATCH (people:Vertex {Value: 'People'}),
+      (v:Vertex)-[:EdgeOut]->(:Edge {Value: 'HAS_NAME'})
+CREATE (v)-[:EdgeOut]->(:Edge {Value: 'INSTANCE_OF'})-[:EdgeIn]->(people);
 
 //
 // Add vehicles
