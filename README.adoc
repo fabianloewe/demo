@@ -9,8 +9,7 @@ Zum anderen sollen die Visualisierungsmethoden zum Erproben bereitgestellt werde
 == Stand
 
 Das Protokoll ist vollständig implementiert und wird zur Kommunikation genutzt.
-Alle grundsätzlichen Visualisierungsmethoden sind implementiert, es fehlen jedoch folgende:
-Auswahl mit Mausrad, ...
+Die Visualisierungsmethoden sind so wie in der Bachelorarbeit angegeben implementiert.
 
 == Umsetzung
 
@@ -128,8 +127,16 @@ Die Einstellungen können jederzeit angepasst werden.
 
 === Aufbau eines DBA-Netzwerks
 
-Als Beispiel für ein Netzwerk aus drei Instanzen ist das `example`-Verzeichnis vorbereitet.
-Die folgenden Befehle starten dieses Netzwerk und muss aus diesem Wurzelverzeichnis ausgeführt werden.
+Als Beispiel für ein Netzwerk aus drei Instanzen wird ein `example`-Verzeichnis vorbereitet.
+
+[bash]
+----
+mkdir -p example/db-app-1
+mkdir example/db-app-2
+mkdir example/db-app-3
+----
+
+Die folgenden Befehle starten dieses Netzwerk und müssen aus diesem Wurzelverzeichnis ausgeführt werden.
 Anstatt Gradle kann auch das Release Version 1.1.0 ausgeführt werden.
 
 [bash]

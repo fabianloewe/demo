@@ -191,7 +191,7 @@ function ForceGraph3D({data, forceGraphProps, settings}) {
 		) {
 			return theme.palette.secondary.main;
 		} else {
-			return link.label === "MetaEdge" ? theme.palette.primary.light : "white";
+			return link.label === "MetaEdge" ? theme.palette.primary.light : "grey";
 		}
 	};
 
@@ -244,7 +244,7 @@ function ForceGraph3D({data, forceGraphProps, settings}) {
 			break;
 		case "nothing":
 		default:
-			// Draw default nodes
+			// Draw default links
 			drawLink = () => null;
 			updateLinkPosition = () => {
 			};
