@@ -28,6 +28,9 @@ class QueryHandler(
      */
     private var stream: Stream? = null
 ) : ProtocolMessageHandler<QueryOuterClass.Query>, QueryController {
+    init {
+        if (stream != null) readyFuture.complete(Unit)
+    }
     /**
      * Called after the stream is activated.
      *
@@ -67,7 +70,10 @@ class QueryHandler(
     /**
      * Sends a [QueryOuterClass.Query] message to the connected peer.
      */
-    override fun query(message: QueryOuterClass.Query) {
-        stream?.writeAndFlush(message)
+    override fun query(message: QueryOuterClass.Query): CompletableFuture<Unit> {
+        return readyFuture.thenApply {
+            stream?.writeAndFlush(message)
+            stream?.close()
+        }
     }
 }

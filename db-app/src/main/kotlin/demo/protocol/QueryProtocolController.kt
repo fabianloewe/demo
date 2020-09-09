@@ -4,21 +4,21 @@ import io.libp2p.core.Stream
 import java.util.concurrent.CompletableFuture
 
 interface AnswerController {
-    fun sendAnswer(answer: AnswerOuterClass.Answer)
+    fun sendAnswer(answer: AnswerOuterClass.Answer): CompletableFuture<Unit>
 }
 
 interface QueryController {
-    fun query(query: String, language: String, filters: List<String>) {
+    fun query(query: String, language: String, filters: List<String>): CompletableFuture<Unit> {
         val builder = QueryOuterClass.Query
             .newBuilder()
             .setQuery(query)
             .setLanguage(language)
         for ((index, filter) in filters.withIndex()) builder.setFilter(index, filter)
         val message = builder.build()
-        query(message)
+        return query(message)
     }
 
-    fun query(message: QueryOuterClass.Query)
+    fun query(message: QueryOuterClass.Query): CompletableFuture<Unit>
 }
 
 interface QueryProtocolController : AnswerController, QueryController {

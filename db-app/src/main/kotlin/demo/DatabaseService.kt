@@ -1,15 +1,17 @@
 package demo
 
 import demo.config.DatabaseConfig
+import demo.protocol.GraphDataOuterClass
 import demo.protocol.QueryOuterClass
 import demo.utils.File
+import demo.utils.GraphDataConsumer
 import demo.utils.ResultValues
+import io.libp2p.core.PeerId
 import org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAME
 import org.neo4j.configuration.connectors.BoltConnector
 import org.neo4j.configuration.helpers.SocketAddress
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder
 import org.slf4j.LoggerFactory
-import java.util.concurrent.CompletableFuture
 import org.neo4j.graphdb.QueryExecutionException as Neo4jQueryExecutionException
 
 class DatabaseService(
@@ -21,10 +23,16 @@ class DatabaseService(
      * The Bolt connector is enabled for debugging purposes with another graph GUI like the IntelliJ plugin.
      */
     private val dbMgmtService = DatabaseManagementServiceBuilder(config.storeDir.toFile())
-        .setConfig(BoltConnector.enabled, true)
-        .setConfig(BoltConnector.listen_address, SocketAddress("localhost", 7687))
+        .apply {
+            if (config.boltPort != null) {
+                setConfig(BoltConnector.enabled, true)
+                setConfig(BoltConnector.listen_address, SocketAddress("localhost", config.boltPort))
+            }
+        }
         .build()
     private val db = dbMgmtService.database(DEFAULT_DATABASE_NAME)
+
+    private val graphDataConsumer = GraphDataConsumer(db, config)
 
     init {
         registerShutdownHook()
@@ -68,9 +76,17 @@ class DatabaseService(
     }
 
     /**
+     * Clears the database.
+     */
+    private fun clear() {
+        db.executeTransactionally("MATCH (n) DETACH DELETE n")
+    }
+
+    /**
      * Initializes the database.
      */
     fun start() {
+        if (config.clearDb) clear()
         if (config.initScript != null) executeInitScript(config.initScript)
         logger.info("Started database service.")
     }
@@ -118,6 +134,13 @@ class DatabaseService(
         } catch (e: Neo4jQueryExecutionException) {
             throw QueryExecutionException(e)
         }
+    }
+
+    /**
+     * Writes the graph data to the database.
+     */
+    fun writeGraphData(peerId: PeerId, graphData: GraphDataOuterClass.GraphData) {
+        graphDataConsumer.consume(peerId, graphData)
     }
 
     companion object {

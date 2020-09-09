@@ -16,16 +16,16 @@ Auswahl mit Mausrad, ...
 
 Die Demo besteht aus drei Komponenten:
 
-* der Datenbankapplikation
-* dem Webdienst
-* der Webapplikation für den Browser
+* der Datenbankapplikation (DBA)
+* dem Webdienst (WD)
+* der Webapplikation für den Browser (WA)
 
-Die Datenbankapplikation hält einen Graphen bereit, welcher mittels eines Skriptes erstellt und
-über den Webdienst abgefragt werden kann.
-Der Webdienst kommuniziert über das Abfrageprotokoll mit der Datenbankapplikation und
-stellt die Webapplikation bereit.
-Die Webapplikation wird vom Browser geladen und übernimmt die Visualisierung.
-Sie kann Anfragen zunächst an den Webdienst versenden, der sie zur Datenbankapplikation weiterleitet.
+Die DBA hält einen Graphen bereit, welcher mittels eines Skriptes erstellt und
+über den WD abgefragt werden kann.
+Werden mehrere Instanzen der DBA gestartet, können sich diese untereinander synchronisieren.
+Der WD kommuniziert über das Abfrageprotokoll mit der DBA und stellt die WA bereit.
+Die WA wird vom Browser geladen und übernimmt die Visualisierung.
+Sie kann Anfragen zunächst an den WD versenden, der sie zur DBA weiterleitet.
 
 In den Quelltexten sind alle Variablen und Klassen sowie deren Dokumentationen und dazugehörige Kommentare
 in englischer Sprache verfasst, um den Code ohne starke Veränderung in ein größeres, quelloffenes Projekt übernehmen zu können.
@@ -48,7 +48,7 @@ Ebenso ist die Weboberfläche englisch, da Teile dieser übernommen werden solle
 
 == Voraussetzungen
 
-Es wird Java Version 11 sowie Node.js Version 14 benötigt.
+Es wird Java Version 11 sowie Node.js Version 12 benötigt.
 
 == Installation
 
@@ -77,15 +77,13 @@ Zunächst muss die Datenbankapplikation gestartet werden und deren `PeerService`
 Dazu führt man in der Kommandozeile die folgenden Befehle aus, wobei `<db-init-script>` mit dem Namen
 eines Skripts im Ordner `scripts` ersetzt werden muss, um die Datenbank mit einem Graphen zu füllen.
 
-Beim Ausführen wird die Datei `db-app-info.json` erstellt, welche die Adresse der Datenbankapplikation enthält.
-Diese Datei muss sich im Wurzelverzeichnis dieses Repos befinden.
-Daher sollte die Datenbankapplikation auch aus dem Wurzelverzeichnis gestartet werden.
-Alternativ kann die Datei nach dem Starten in das Verzeichnis kopiert werden.
+Beim Ausführen wird die Datei `info.json` erstellt, welche die Adresse der Datenbankapplikation enthält.
+Der Pfad kann beliebig geändert werden.
 
 [bash]
 ----
 cd <pfad/zur/entpackten/zip-datei>
-./bin/db-app --init-db scripts/<db-init-script> <optional-weitere-args>
+./bin/db-app --init-db scripts/<db-init-script> --self-json info.json <optional-weitere-args>
 ----
 
 Es werden weitere Kommandozeilenargumente unterstützt, die an Stelle von `<optional-weitere-args>` eingesetzt werden können.
@@ -95,16 +93,18 @@ Alternativ kann auch Gradle den Quellcode kompilieren und direkt ausführen:
 
 [bash]
 ----
-./gradlew run --args="--init-db scripts/<db-init-script> <optional-weitere-args>"
+./gradlew run --args="--init-db scripts/<db-init-script> --self-json info.json <optional-weitere-args>"
 ----
 
 Als Nächstes kann der Webdienst mit einem der folgenden Befehle gestartet werden.
+Der Parameter `-i` gibt den Pfad zur DBA-Infodatei an.
 
 Den Entwicklungsserver starten:
 
 [bash]
 ----
-npm run dev
+cd web-app
+npm run dev -- -i <pfad/zu/info.json>
 ----
 
 Den Produktionsserver starten:
@@ -112,7 +112,7 @@ Den Produktionsserver starten:
 [bash]
 ----
 npm run build
-npm start
+npm start -- -i <pfad/zu/info.json>
 ----
 
 Die Webapplikation kann nun unter folgender Adresse erreicht werden:
@@ -125,6 +125,66 @@ Durch den Knopf _Send_ wird diese an die Datenbankapplikation geleitet.
 
 Danach wird die Visualisierung konfiguriert. Das Drücken von _Save_ erstellt diese schließlich.
 Die Einstellungen können jederzeit angepasst werden.
+
+=== Aufbau eines DBA-Netzwerks
+
+Als Beispiel für ein Netzwerk aus drei Instanzen ist das `example`-Verzeichnis vorbereitet.
+Die folgenden Befehle starten dieses Netzwerk und muss aus diesem Wurzelverzeichnis ausgeführt werden.
+Anstatt Gradle kann auch das Release Version 1.1.0 ausgeführt werden.
+
+[bash]
+----
+gradlew run --args="--init-db ../scripts/specialized-hypergraph.cypher --db-dir ../example/db-app-1 --self-json ../example/db-app-1/info.json"
+----
+
+Dies startet die erste Instanz, welche den Graphen aus `scripts/specialized-hypergraph.cypher` lädt,
+als Arbeitsverzeichnis der Datenbank `example/db-app-1` zugewiesen bekommt und
+seine Infodatei nach `example/db-app-1/info.json` schreibt.
+
+In einem zweiten Terminal muss der nächste Befehl ausgeführt werden.
+
+[bash]
+----
+gradlew run --args="--init-db ../scripts/specialized-hypergraph.cypher --db-dir ../example/db-app-2 --self-json ../example/db-app-2/info.json"
+----
+
+Dies lädt denselben Graphen, ändert aber das Verzeichnis aus `example/db-app-2`.
+
+In einem dritten Terminal folgt der letzte Befehl.
+
+[bash]
+----
+gradlew run --args="-s --db-dir ../example/db-app-3 --self-json ../example/db-app-3/info.json --bootstrap-json ../example/db-app-1/info.json --bootstrap-json ../example/db-app-2/info.json"
+----
+
+Diese Instanz lädt keinen Graphen, baut dafür mittels der Infodateien eine Verbindung zu den anderen Instanzen auf und
+synchronisiert ihre Datenbank mit den anderen.
+
+=== Einschränkungen
+
+Bei der Synchronisierung mit mehreren Instanzen wird versucht, Duplikate zu vermeiden.
+Dies wird mittels Mustervergleich der erhaltenen Knoten und der Nachverfolgung der Kanten
+bis zu einer Pfadlänge von 3 umgesetzt. Sollten die Muster und Pfade dennoch übereinstimmen,
+werden diese Teile des Graphen doppelt gespeichert.
+
+Dem kann entgegengewirkt werden, indem die synchronisierende/n Instanz/en mit einem Skript initialisiert werden,
+dass passende Einschränkungen entsprechend des zu synchronisierenden Graphen definiert.
+Dazu kann der Cypher-Befehl `CREATE CONSTRAINT` verwendet.
+(siehe https://neo4j.com/docs/cypher-manual/current/administration/constraints/[Doku])
+
+Nun kann der Webdienst mit einer der Instanzen verbunden werden und deren Daten visualisieren.
+Dazu können folgende Befehle in einem vierten Terminal ausgeführt werden:
+
+[bash]
+----
+cd web-app
+npm run dev -- -i ../example/db-app-3/info.json
+----
+
+Befinden sich die Instanzen auf jeweils unterschiedlichen Rechnern,
+kann mit der Option `--enable-discovery` ein automatischer Verbindungsaufbau mittels mDNS
+getestet werden. Die Funktionalität kann jedoch nicht garantiert werden,
+da es mehrere Probleme mit dieser Verbindungsmethode gibt.
 
 == Technologien und Hilfe
 

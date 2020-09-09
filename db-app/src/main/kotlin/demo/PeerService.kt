@@ -2,26 +2,28 @@ package demo
 
 import demo.config.PeerConfig
 import demo.protocol.*
-import demo.utils.File
+import demo.utils.*
+import identify.pb.IdentifyOuterClass
 import io.libp2p.core.*
 import io.libp2p.core.crypto.KEY_TYPE
 import io.libp2p.core.crypto.PrivKey
 import io.libp2p.core.dsl.host
 import io.libp2p.core.multiformats.Multiaddr
+import io.libp2p.core.multiformats.Protocol
 import io.libp2p.crypto.keys.RsaPrivateKey
+import io.libp2p.crypto.keys.RsaPublicKey
+import io.libp2p.discovery.MDnsDiscovery
+import io.libp2p.host.MemoryAddressBook
 import io.libp2p.mux.mplex.MplexStreamMuxer
 import io.libp2p.protocol.Identify
+import io.libp2p.protocol.IdentifyController
 import io.libp2p.security.plaintext.PlaintextInsecureChannel
 import io.libp2p.security.secio.SecIoSecureChannel
 import io.libp2p.transport.tcp.TcpTransport
-import io.libp2p.transport.ws.WsTransport
 import org.slf4j.LoggerFactory
 import java.io.File as JavaFile
-import java.security.KeyFactory
-import java.security.spec.PKCS8EncodedKeySpec
-import java.security.spec.X509EncodedKeySpec
-import java.util.*
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 
 class PeerService(
     private val config: PeerConfig,
@@ -29,16 +31,45 @@ class PeerService(
     answerHandler: AnswerCallback
 ) {
     /**
-     * The default instance of [QueryProtocol].
+     * The default instance of [QueryRespondProtocol].
      *
      * This is used in buildHost() and must be initialized first.
      */
-    private val queryProtocol = QueryProtocol(queryHandler, answerHandler).Binding()
+    private val queryProtocol = QueryProtocol(queryHandler, answerHandler)
+
+    /**
+     * The current Identify protocol instance
+     */
+    private val identifyProtocol = Identify()
 
     /**
      * A [Host] instance representing this peer.
      */
     private val host: Host = buildHost()
+
+    /**
+     * An address book of all known peers
+     */
+    private val addressBook = host.addressBook
+
+    /**
+     * An identity book with the public keys of all known peers
+     */
+    private val identityBook = ConcurrentHashMap<PeerId, RsaPublicKey>()
+
+    /**
+     * AddressBook add helper.
+     */
+    private operator fun AddressBook.set(id: PeerId, addrs: List<Multiaddr>) {
+        addAddrs(id, Long.MAX_VALUE, *addrs.toTypedArray())
+    }
+
+    /**
+     * AddressBook remove helper.
+     */
+    private operator fun AddressBook.minusAssign(id: PeerId) {
+        setAddrs(id, 0)
+    }
 
     /**
      * Reads the private and public RSA keys.
@@ -64,13 +95,8 @@ class PeerService(
         logger.debug("Processed private key: $privateKeyContent")
         logger.debug("Processed public key: $publicKeyContent")
 
-        val kf = KeyFactory.getInstance("RSA")
-
-        val keySpecPKCS8 = PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyContent))
-        val privKey = kf.generatePrivate(keySpecPKCS8)
-
-        val keySpecX509 = X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyContent))
-        val pubKey = kf.generatePublic(keySpecX509)
+        val privKey = privateKeyContent.toPrivateKey()
+        val pubKey = publicKeyContent.toPublicKey()
 
         // Return a factory function which provides the RSA keys
         return { RsaPrivateKey(privKey, pubKey) }
@@ -124,10 +150,11 @@ class PeerService(
         // Define the support protocols by this host
         protocols {
             // Adds support for the Identify protocol defined by libp2p
-            +Identify()
+            +identifyProtocol
 
             // Adds support for the demo query protocol
-            +queryProtocol
+            +queryProtocol.first
+            +queryProtocol.second
         }
     }
 
@@ -152,7 +179,84 @@ class PeerService(
             .thenAccept {
                 logger.info("Started peer service.")
                 logger.info("Listening on addresses: ${host.listenAddresses().joinToString()}")
+
+                if (config.enableDiscovery) host.startDiscovery()
+
+                for (bootstrapPeer in config.bootstrapPeers) {
+                    val (peerId, multiaddr) = bootstrapPeer.toPeerIdAndAddr()
+                    val peerInfo = PeerInfo(peerId, listOf(multiaddr))
+                    requestIdentity(peerInfo)
+                }
             }
+    }
+
+    private fun Host.startDiscovery() {
+        val discoverer = MDnsDiscovery(this)
+        discoverer.newPeerFoundListeners += ::handlePeer
+        discoverer.start()
+        logger.info("Discovery started")
+    }
+
+    /**
+     * Handle newly discovered peer
+     */
+    private fun handlePeer(peerInfo: PeerInfo) {
+        if (peerInfo.peerId != host.peerId) {
+            logger.info("New peer connected: ${peerInfo.peerId}")
+            addressBook[peerInfo.peerId].thenAccept { addresses ->
+                if (addresses == null) {
+                    addressBook[peerInfo.peerId] = peerInfo.addresses
+                    requestIdentity(peerInfo)
+                }
+            }
+        }
+    }
+
+    /**
+     * Requests the identity of the new peer for further checks.
+     */
+    private fun requestIdentity(peerInfo: PeerInfo) {
+        val peerAddresses = peerInfo.addresses.toTypedArray()
+        identifyProtocol
+            // Connect to peer with Identify protocol
+            .dial(host, peerInfo.peerId, *peerAddresses)
+            .controller
+            // Await id from IdentifyController
+            .thenCompose(IdentifyController::id)
+            .thenAccept { id ->
+                // Check if the identity book already contains this peer
+                if (identityBook.containsKey(peerInfo.peerId)) {
+                    checkIdentity(peerInfo.peerId, id)
+                } else {
+                    // If it doesn't, add the announced addresses to the address book
+                    val listenPeerAddresses = id
+                        .listenAddrsList
+                        .map {
+                            Multiaddr(it.toByteArray())
+                        }
+                        .toTypedArray()
+                    addressBook.addAddrs(peerInfo.peerId, Long.MAX_VALUE, *listenPeerAddresses)
+                }
+            }
+    }
+
+    /**
+     * Checks the identity.
+     *
+     * If the identity doesn't match, the peer will be removed from [addressBook].
+     */
+    private fun checkIdentity(peerId: PeerId, id: IdentifyOuterClass.Identify) {
+        // Create an RSA public key representation
+        val receivedKey = id
+            .publicKey
+            .toPublicKey()
+            .toRsaPublicKey()
+        val knownKey = identityBook[peerId]
+        if (knownKey != null && knownKey != receivedKey) {
+            // Remove peer as its identity has changed
+            addressBook -= peerId
+            logger.warn("Peer $peerId has a different identity and will be ignored for now")
+        }
     }
 
     /**
@@ -165,27 +269,39 @@ class PeerService(
      * @param file The file to write to
      */
     fun storeAddress(file: JavaFile) {
-        val jsonAddresses = host
-            .listenAddresses()
-            .joinToString(prefix = "[", postfix = "]") { "\"$it\"" }
-
-        file.writeText("""
-            {
-                "peerId": "${host.peerId}",
-                "addresses": $jsonAddresses
-            }
-        """.trimIndent())
+        val info = SimplePeerInfo(
+            host.peerId,
+            host.listenAddresses(),
+            host.privKey.publicKey() as RsaPublicKey
+        )
+        file.writeText(info.toJson())
         logger.info("Written info file to $file")
     }
 
     /**
-     * Connects to the target address with the query protocol.
+     * Connects to the target address for the querying.
      *
      * @param targetAddress The target's multiaddress
-     * @returns A future returning a [QueryProtocolController]
+     * @returns A future returning a [QueryController]
      */
-    fun dialTo(targetAddress: Multiaddr): CompletableFuture<out QueryProtocolController> {
-        return queryProtocol.dial(host, targetAddress).controller
+    fun connectToQuery(targetAddress: Multiaddr): CompletableFuture<out QueryController> {
+        return queryProtocol
+            .first
+            .dial(host, targetAddress)
+            .controller
+    }
+
+    /**
+     * Connects to the target address for answering to a query.
+     *
+     * @param targetAddress The target's multiaddress
+     * @returns A future returning a [AnswerController]
+     */
+    fun connectToAnswer(targetAddress: Multiaddr): CompletableFuture<out AnswerController> {
+        return queryProtocol
+            .second
+            .dial(host, targetAddress)
+            .controller
     }
 
     companion object {

@@ -4,9 +4,9 @@ static/sw.js
 out
 *-error.log
 yarn.lock
-build
+build/
 .idea
 .gradle
 data/
 logs/
-db-app-info.json
+info.json

@@ -69,7 +69,9 @@ class AnswerHandler(
         readyFuture.completeExceptionally(cause)
     }
 
-    override fun sendAnswer(answer: AnswerOuterClass.Answer) {
-        stream?.writeAndFlush(answer)
+    override fun sendAnswer(answer: AnswerOuterClass.Answer): CompletableFuture<Unit> {
+        return readyFuture.thenApply {
+            stream?.writeAndFlush(answer)
+        }
     }
 }

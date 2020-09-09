@@ -8,5 +8,7 @@ data class PeerConfig(
   val privateKey: File? = null,
   val publicKey: File? = null,
   val publishAddress: String? = null,
-  val bootstrapPeers: List<Multiaddr> = listOf()
+  val bootstrapPeers: List<Multiaddr> = listOf(),
+  val selfDescJsonPath: java.io.File? = null,
+  val enableDiscovery: Boolean = false
 )

@@ -1,0 +1,9 @@
+package demo.utils
+
+typealias ResultValues = List<kotlin.Any>
+
+val HYPERGRAPH_VERTEX_LABEL = "Vertex"
+val HYPERGRAPH_EDGE_LABEL = "Edge"
+val SPECIALIZED_HYPERGRAPH_EDGE_OUT_LABEL = "EdgeOut"
+val SPECIALIZED_HYPERGRAPH_EDGE_IN_LABEL = "EdgeIn"
+val SPECIALIZED_HYPERGRAPH_META_LABEL = "MetaEdge"

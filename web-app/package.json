@@ -2,7 +2,7 @@
 	"name": "web-app",
 	"private": true,
 	"version": "1.0.0",
-  "basedOn": {
+	"basedOn": {
 		"url": "https://github.com/ooade/NextSimpleStarter"
 	},
 	"engines": {
@@ -17,6 +17,7 @@
 		"axios": "^0.20.0",
 		"body-parser": "^1.19.0",
 		"codemirror": "^5.57.0",
+		"commander": "^6.1.0",
 		"express": "^4.17.1",
 		"it-buffer": "^0.1.2",
 		"it-length-prefixed": "^3.1.0",
@@ -31,21 +32,21 @@
 		"libp2p-tcp": "^0.15.1",
 		"libp2p-websockets": "^0.14.0",
 		"multiaddr": "^8.0.0",
-		"next": "^9.5.2",
+		"next": "^9.5.3",
 		"next-offline": "^5.0.2",
-		"peer-id": "^0.14.0",
+		"peer-id": "^0.14.1",
 		"react": "^16.13.1",
 		"react-axe": "^3.5.3",
 		"react-codemirror2": "^7.2.1",
 		"react-dom": "^16.13.1",
-		"react-force-graph": "^1.36.7",
+		"react-force-graph": "^1.36.9",
 		"streaming-iterables": "^5.0.2",
 		"three": "^0.118.3",
 		"three-spritetext": "^1.5.2"
 	},
 	"scripts": {
-		"dev": "babel-node src/server/index.js",
-		"start": "NODE_ENV=production babel-node src/server/index.js",
+		"dev": "cd bin && dev",
+		"start": "NODE_ENV=production node lib/server/index.js",
 		"lint": "eslint components",
 		"build": "next build",
 		"build:server": "NEXT_TARGET=server next build",
@@ -55,8 +56,9 @@
 		"now-build": "next build"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.11.4",
-		"@babel/node": "^7.10.5",
+		"@babel/cli": "^7.11.6",
+		"@babel/core": "^7.11.6",
+		"@babel/preset-env": "^7.11.5",
 		"babel-eslint": "^10.1.0",
 		"eslint": "^6.8.0",
 		"eslint-config-react-app": "^5.2.1",
@@ -64,6 +66,7 @@
 		"eslint-plugin-jsx-a11y": "^6.3.1",
 		"eslint-plugin-react": "^7.20.6",
 		"eslint-plugin-react-hooks": "^4.1.0",
+		"nodemon": "^2.0.4",
 		"serve": "^11.3.2"
 	}
 }

@@ -28,7 +28,7 @@ function mapProperties(element) {
 function buildNode(vertex) {
 	console.log("Vertex:", vertex);
 	return {
-		id: vertex.id || "0",
+		id: vertex.id || Math.random(),
 		label: (vertex.labels || ["No label"]).join(" | "),
 		properties: mapProperties(vertex)
 	}
@@ -92,7 +92,7 @@ function buildNodeAndLinksFromHyperedge(edge, nodes, edges) {
 			return null;
 		}
 		return {
-			id: Math.random(),
+			id: metaEdgeId,
 			label: "MetaEdge",
 			properties: mapProperties(metaEdge),
 			outVertex: outVertex.id,
@@ -132,7 +132,7 @@ function createLinkBuilder(nodes, edges) {
 		} else {
 			console.log("Edge:", edge);
 			return [{
-				id: edge.id || "0",
+				id: edge.id || Math.random(),
 				label: (edge.labels || ["No label"]).join(" | "),
 				properties: mapProperties(edge),
 				inVertex: inVertex.id,

@@ -5,13 +5,14 @@ plugins {
     java
     application
     id("com.github.johnrengelman.shadow") version "6.0.0"
-    //id("com.google.protobuf") version "0.8.12"
+    kotlin("plugin.serialization") version "1.4.0"
 }
 
 repositories {
     mavenCentral()
     jcenter()
     maven("https://plugins.gradle.org/m2/")
+    maven("https://jitpack.io")
 }
 
 application {
@@ -27,8 +28,14 @@ dependencies {
 
     implementation(project(":lib"))
 
+    // JSON support
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
+
     // jvm-libp2p implementation
     implementation("io.libp2p:jvm-libp2p-minimal:0.5.5-RELEASE")
+
+    // multihash support
+    implementation("com.github.multiformats:java-multihash:1.3.0")
 
     // commandline parser
     implementation("com.github.ajalt:clikt:2.8.0")

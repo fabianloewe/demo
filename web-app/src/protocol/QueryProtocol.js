@@ -20,11 +20,18 @@ function decodeGraphData(answer) {
 
 export default class QueryProtocol {
 	/**
-	 * Protocol identifier for libp2p.
+	 * Protocol identifier for sending for libp2p.
 	 *
 	 * @type {string}
 	 */
-	static ID = "/demo/query/1.0.0";
+	static SEND_ID = "/demo/query/send/1.0.0";
+
+	/**
+	 * Protocol identifier for sending for libp2p.
+	 *
+	 * @type {string}
+	 */
+	static RESPOND_ID = "/demo/query/respond/1.0.0";
 
 	/**
 	 * Default decoders for data field of Answer messages.

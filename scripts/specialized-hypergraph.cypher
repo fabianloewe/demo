@@ -2,6 +2,13 @@
 // The following script defines a subset of the Bond graph (bond-graph.cypher)
 // as a specialized hypergraph with included type definitions and relations.
 //
+// Vertices must be marked with "Vertex".
+// Edges must be marked with "Edge".
+// Directions must be signaled with "EdgeIn" and "EdgeOut".
+// Meta-edges must be marked with "MetaEdge".
+// This is required for building correct Answer messages.
+// Other labels can be set through CLI parameters.
+//
 
 MATCH (n)
 DETACH DELETE n;
